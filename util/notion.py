@@ -2,7 +2,7 @@ from notion_client import Client
 import os
 
 NOTION_TOKEN = os.environ["NOTION_TOKEN"]
-DATABASE_ID = "1b5d342275f38044be36c711e2de4c87"
+DATABASE_ID = os.environ["DATABASE_ID"]
 client = Client(auth=NOTION_TOKEN)
 
 def get_member_ids():

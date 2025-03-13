@@ -12,6 +12,3 @@ def check_bluetooth_device(address):
     except Exception as e:
         print(f"Error: {e}")
         return -1
-
-address = "98:50:2e:b9:80:ec"
-print(check_bluetooth_device(address))
