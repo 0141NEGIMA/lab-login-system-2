@@ -9,7 +9,7 @@ def get_member_ids():
     response = client.databases.query(
         database_id=DATABASE_ID
     )
-    return [(member["id"], member["properties"]["入退室状況"]["status"]["name"], member["properties"]["累計（分）"]["number"]) for member in response["results"]]
+    return [{"id": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"]} for member in response["results"]]
 
 def enter_room(page_id):
     response = client.pages.update(
@@ -50,7 +50,7 @@ def create_member(member_name):
             },
             "入退室状況": {
                 "status": {
-                    "name": "退室"
+                    "name": "入室"
                 }
             },
             "累計（分）": {
@@ -58,7 +58,7 @@ def create_member(member_name):
             }
         }
     )
-    print(f"Welcome {member_name}!")
+    print(f"Notion: Welcome {member_name}!")
     return(response["id"])
 
 def delete_member(member_name):
@@ -78,6 +78,8 @@ def delete_member(member_name):
                 page_id=page_id,
                 archived=True
             )
-        print(f"{member_name} has archived.")
+        print(f"Notion: {member_name} has archived.")
+        return 0
     else:
-        print(f"{member_name} was not found.")
+        print(f"Notion: {member_name} was not found.")
+        return 1
