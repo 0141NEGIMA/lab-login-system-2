@@ -5,11 +5,11 @@ NOTION_TOKEN = os.environ["NOTION_TOKEN"]
 DATABASE_ID = os.environ["DATABASE_ID"]
 client = Client(auth=NOTION_TOKEN)
 
-def get_member_ids():
+def get_all_members_info():
     response = client.databases.query(
         database_id=DATABASE_ID
     )
-    return [{"id": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"]} for member in response["results"]]
+    return [{"notionid": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"]} for member in response["results"]]
 
 def enter_room(page_id):
     response = client.pages.update(
@@ -31,6 +31,16 @@ def leave_room(page_id):
                 "status": {
                     "name": "退室"
                 }
+            }
+        }
+    )
+    
+def set_total_minutes(page_id, total_minutes):
+    client.pages.update(
+        page_id=page_id,
+        properties = {
+            "累計（分）": {
+                "number": total_minutes
             }
         }
     )

@@ -1,18 +1,6 @@
-import sqlite3
+mydicks = [{"key1": 0} for _ in range(3)]
+print(f"before: {mydicks}")
 
-# DBの作成
-dbname = 'test.db'
-conn = sqlite3.connect(dbname)
-cur = conn.cursor()
-
-# テーブルの作成
-create_table_query = "CREATE TABLE IF NOT EXISTS person(id INTEGER PRIMARY KEY AUTOINCREMENT, name STING)"
-cur.execute(create_table_query)
-
-# 行の挿入
-insert_query = "INSERT INTO person (name) VALUES ('taro')"
-cur.execute(insert_query)
-
-# 変更の反映
-conn.commit()
-conn.close()
+for dick in mydicks:
+    dick["key2"] = 0
+print(f"after: {mydicks}")
