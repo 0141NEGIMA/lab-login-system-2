@@ -2,8 +2,8 @@ import re
 import mysql.connector
 import util.notion as notion
 
-# ユーザ名とMACアドレスの入力
-user_name = input("Enter your name: ")
+# メンバー名とMACアドレスの入力
+member_name = input("Enter your name: ")
 while True:
     mac_address_format = r'^([0-9a-f]{2}[:-]){5}([0-9a-f]{2})$'
     mac_address = input("Enter the MAC address of your bluetooth device: ")
@@ -12,10 +12,10 @@ while True:
     else:
         print("Bad MAC address. (example: 12:34:56:78:9a:bc)")
 
-print(f"Registering {user_name}...")
+print(f"Registering {member_name}...")
 
 # notionに登録
-new_id = notion.create_member(user_name)
+new_id = notion.create_member(member_name)
 
 # MySQLに接続
 conn = mysql.connector.connect(
@@ -27,7 +27,7 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 
 # データの挿入
-insert_query = f"INSERT INTO member (name, macaddr, notionid) VALUES ('{user_name}', '{mac_address}', '{new_id}')"
+insert_query = f"INSERT INTO member (name, macaddr, notionid) VALUES ('{member_name}', '{mac_address}', '{new_id}')"
 cursor.execute(insert_query)
 conn.commit()
 
@@ -35,4 +35,4 @@ conn.commit()
 cursor.close()
 conn.close()
 
-print(f"{user_name} was successfully registered in the DB!")
+print(f"{member_name} was successfully registered in the DB!")

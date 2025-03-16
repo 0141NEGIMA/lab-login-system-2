@@ -1,19 +1,18 @@
-import schedule
-import time
-from datetime import datetime
-import util.notion as notion
+import sqlite3
 
-# 入退室チェック実行間隔
-n = 1
+# DBの作成
+dbname = 'test.db'
+conn = sqlite3.connect(dbname)
+cur = conn.cursor()
 
-def myfunc():
-    print(f"It is {datetime.now()} now.")
-    print(notion.get_member_ids())
+# テーブルの作成
+create_table_query = "CREATE TABLE IF NOT EXISTS person(id INTEGER PRIMARY KEY AUTOINCREMENT, name STING)"
+cur.execute(create_table_query)
 
-while True:
-    now = datetime.now()
-    if now.minute % n == 0 and now.second == 0:
-        myfunc()
-        # 次のターゲット時間まで待機
-        time.sleep(10)  # 10秒待つことで重複実行を防止
-    time.sleep(1)  # 1秒ごとにチェック
+# 行の挿入
+insert_query = "INSERT INTO person (name) VALUES ('taro')"
+cur.execute(insert_query)
+
+# 変更の反映
+conn.commit()
+conn.close()
