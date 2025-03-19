@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = 'db/lab_login_system_2.db'
+DB_NAME = '../db/lab_login_system_2.db'
 TABLE_NAME = "member"
 
 # テーブルの作成
