@@ -36,7 +36,7 @@ def update():
                     log.print_info_log(f"{member['name']} is still in the room.")
                 elif target_notion_status == "退室": # 新たに入室した人は更新
                     nt.enter_room(target_notionid)
-                    log.print_info_log(f"INFO[{datetime.now()}]: {member['name']} has entered the room.")
+                    log.print_info_log(f"{member['name']} has entered the room.")
                     log.write_info_log(f"{member['name']} has entered the room.")
             elif target_ping_status == 0: # 疎通失敗したら
                 if target_notion_status == "入室": # 新たに退室した人は更新
