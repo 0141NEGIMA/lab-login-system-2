@@ -1,4 +1,5 @@
 import bluetooth
+import util.log as log
 
 def check_bluetooth_device(address):
     try:
@@ -10,5 +11,5 @@ def check_bluetooth_device(address):
             #print(f"{address} has not been found.")
             return 0
     except Exception as e:
-        print(f"Error: {e}")
+        log.write_error_log(e)
         return -1
