@@ -4,6 +4,7 @@ import util.notion as nt
 import util.sqlite as sq
 import util.bluetooth as bt
 import util.log as log
+import util.slack_status as slc
 
 # 入退室チェック間隔（分）
 n = 1
@@ -36,11 +37,13 @@ def update():
                     log.print_info_log(f"{member['name']} is still in the room.")
                 elif target_notion_status == "退室": # 新たに入室した人は更新
                     nt.enter_room(target_notionid)
+                    slc.update_slack_status(clear=False)
                     log.print_info_log(f"{member['name']} has entered the room.")
                     log.write_info_log(f"{member['name']} has entered the room.")
             elif target_ping_status == 0: # 疎通失敗したら
                 if target_notion_status == "入室": # 新たに退室した人は更新
                     nt.leave_room(target_notionid)
+                    slc.update_slack_status(clear=True)
                     log.print_info_log(f"{member['name']} has left the room.")
                     log.write_info_log(f"{member['name']} has left the room.")
                 elif target_notion_status == "退室":

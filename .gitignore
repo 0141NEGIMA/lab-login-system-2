@@ -1,3 +1,4 @@
 db
 log
 src/util_test.py
+src/util/.env
