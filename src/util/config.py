@@ -3,10 +3,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+DATABASE_ID = os.getenv("DATABASE_ID")
+
 SLACK_TOKEN = os.getenv("SLACK_TOKEN")
 SLACK_USER_ID = os.getenv("SLACK_USER_ID")
 STATUS_EMOJI = os.getenv("STATUS_EMOJI")
 
+def get_notion_token():
+    return NOTION_TOKEN
+
+def get_database_id():
+    return DATABASE_ID
 
 def get_slack_token():
     return SLACK_TOKEN

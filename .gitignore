@@ -1,4 +1,5 @@
 db
 log
+lls2env
 src/util_test.py
 src/util/.env
