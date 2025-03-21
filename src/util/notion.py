@@ -2,7 +2,7 @@ from notion_client import Client
 from util.config import get_notion_token, get_database_id
 
 NOTION_TOKEN = get_notion_token()
-DATABASE_ID = get_database_id
+DATABASE_ID = get_database_id()
 client = Client(auth=NOTION_TOKEN)
 
 def get_all_members_info():
