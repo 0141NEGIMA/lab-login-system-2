@@ -12,7 +12,7 @@ echo "START:" $(date "+%Y/%m/%d %H:%M:%S") >> ${LOGFILE}
 trap 'cleanup 130' INT  # 130はSIGINTによる終了コード
 trap 'cleanup 143' TERM # 143はSIGTERMによる終了コード
 
-python3 src/main.py
+./lls2env/bin/python3 src/main.py
 status=$?
 
 cleanup $status
