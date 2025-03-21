@@ -1,5 +1,6 @@
 import requests
-from config import get_slack_token, get_slack_user_id, get_status_emoji
+from util.config import get_slack_token, get_slack_user_id, get_status_emoji
+#from config import get_slack_token, get_slack_user_id, get_status_emoji
 
 def update_slack_status(user_id=None, clear=False):
     """
