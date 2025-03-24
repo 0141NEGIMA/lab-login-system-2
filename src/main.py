@@ -35,22 +35,17 @@ def update():
             if target_ping_status == 1: # 疎通成功したら
                 if target_notion_status == "入室": # 元々入室していた人は累計分カウントを追加
                     nt.set_total_minutes(target_notionid, target_total_minutes + n)
-                    log.print_info_log(f"{member['name']} is still in the room.")
                 elif target_notion_status == "退室": # 新たに入室した人は更新
                     nt.enter_room(target_notionid)
                     if member['name'] == get_slack_user_name():
                         slc.update_slack_status(clear=False)
-                    log.print_info_log(f"{member['name']} has entered the room.")
-                    log.write_info_log(f"{member['name']} has entered the room.")
+                    sq.insert_into_record(member['name'], 'enter', datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
             elif target_ping_status == 0: # 疎通失敗したら
                 if target_notion_status == "入室": # 新たに退室した人は更新
                     nt.leave_room(target_notionid)
                     if member['name'] == get_slack_user_name():
                         slc.update_slack_status(clear=True)
-                    log.print_info_log(f"{member['name']} has left the room.")
-                    log.write_info_log(f"{member['name']} has left the room.")
-                elif target_notion_status == "退室":
-                    log.print_info_log(f"{member['name']} is still out of the room.")
+                    sq.insert_into_record(member['name'], 'leave', datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
     except Exception as e:
         log.write_error_log(e)
 

@@ -1,11 +1,39 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import timedelta
 
-def make_figure(input_path, output_path):
-    # CSVデータの読み込み
-    df = pd.read_csv(input_path, index_col=0)
+def db2df(record, start_dt):
+    # 時刻をdatetime型に変換
+    record['timestamp'] = pd.to_datetime(record['timestamp'], format='%Y/%m/%d %H:%M:%S')
 
+    # 0に初期化されたoutput
+    columns = [f"{hh:02}:{mm:02}" for hh in range(24) for mm in range(0, 60, 10)]
+    date_index = [(start_dt + timedelta(days=i)).strftime("%-m/%-d (%a)") for i in range(7)]
+    output = pd.DataFrame(0, index=date_index, columns=columns)
+
+    # 7日間を10分間隔で区切るスロットを生成
+    time_slots = [start_dt + timedelta(minutes=10 * i) for i in range(6*24*7)]
+
+    # 入室していたスロットを1にする
+    enter_flag = False
+    current_slot_id = 0
+    for i in range(len(record.index)):
+        el = record.iat[i, 0]
+        if el == "enter":
+            from_dt = record.iat[i, 1]
+            while time_slots[current_slot_id+1] < from_dt:
+                current_slot_id += 1
+            enter_flag = True
+        elif el == "leave" and enter_flag:
+            to_dt = record.iat[i, 1]
+            while current_slot_id < len(time_slots) and time_slots[current_slot_id] < to_dt:
+                output.iat[current_slot_id//(6*24), current_slot_id%(6*24)] = 1
+                current_slot_id += 1
+            enter_flag = False
+    return output
+
+def make_figure(df, output_path):
     # 合計分数のカウント
     count = df.sum(axis=1)
     df = df.rename(index={old: f"{old}:  {count[old]//6}h{count[old]%6*10}m" for old in df.index.to_list()})
