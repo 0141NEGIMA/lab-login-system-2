@@ -16,7 +16,7 @@ with open(csv_file, "w", encoding="utf-8") as f:
     for i, day in enumerate(day_order):
         current_day_row = [day] + [1 if (i+1)*6 <= slot < (i+2)*6 else 0 for slot in range(6*24)]
         writer.writerow(current_day_row)
-        writer.writerow(empty_row)
+        #writer.writerow(empty_row)
     
 
 with open(csv_file, "r") as f:
