@@ -57,3 +57,14 @@ def insert_into_record(member_name, enter_leave, timestamp):
     cur.execute(insert_query)
     conn.commit()
     conn.close()
+
+# テーブルをリセットする
+def reset_table(table_name):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+    delete_query = f"DELETE FROM {table_name};"
+    sequence_reset_query = f"DELETE FROM sqlite_sequence WHERE name = '{table_name}';"
+    cur.execute(delete_query)
+    cur.execute(sequence_reset_query)
+    conn.commit()
+    conn.close()
