@@ -1,10 +1,11 @@
-import locale
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import timedelta, datetime
 from util import sqlite as sq
+from util import slack_DM as dm
 
+# DBから入退室記録を取得してpandasのDataframe型にする
 def db2df(member_name, start_dt):
     # あるメンバーの全ての入退室recordを取得
     record = sq.select_from_record(member_name)
@@ -41,6 +42,7 @@ def db2df(member_name, start_dt):
             enter_flag = False
     return output
 
+# pandasのDataframe型を画像に変換する
 def df2figure(df, output_path, member_name, start_dt):
     # 合計分数のカウント
     count = df.sum(axis=1)
@@ -80,11 +82,21 @@ def df2figure(df, output_path, member_name, start_dt):
 
 def make_figure(start_dt):
     members = sq.get_all_members_info()
+    results = []
     for member in members:
         output_path = f"log/{start_dt.strftime('%Y%m%d')}_{member['name']}.png"
         print(f"Making {output_path}...")
         df = db2df(member['name'], start_dt)
         df2figure(df, output_path, member['name'], start_dt)
+        results.append({'slackid': member['slackid'], 'image_path': output_path})
+    return results
+    
 
-#start_dt = datetime.strptime("2025/03/23 00:00:00", "%Y/%m/%d %H:%M:%S")
-#make_figure(start_dt)
+def send_all_figure(start_dt):
+    results = make_figure(start_dt)
+    for row in results:
+        dm.send_slack_dm_with_image(user_id=row['slackid'], image_path=row['image_path'])
+
+
+start_dt = datetime.strptime("2025/03/23 00:00:00", "%Y/%m/%d %H:%M:%S")
+make_figure(start_dt)

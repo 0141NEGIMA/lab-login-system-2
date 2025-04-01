@@ -20,7 +20,7 @@ def get_all_members_info():
     result = []
     select_query = f"SELECT * FROM member"
     for row in cur.execute(select_query):
-        result.append({"name": row[1], "macaddr": row[2], "notionid": row[3]})
+        result.append({"name": row[1], "macaddr": row[2], "notionid": row[3], "slackid": row[4]})
     conn.close()
     return result
 
