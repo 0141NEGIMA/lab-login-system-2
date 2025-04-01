@@ -25,8 +25,9 @@ def db2df(member_name, start_dt):
             columns.append(f"{slot_dt.strftime('%H')}:{slot_dt.strftime('%M')}")
 
     columns = [f"{hh:02}:{mm:02}" for hh in range(24) for mm in range(0, 60, 10)]
-    weekday_jp = ["月", "火", "水", "木", "金", "土", "日"]
-    date_index = [f'{(start_dt + timedelta(days=i)).strftime("%m/%d")} ({weekday_jp[(start_dt + timedelta(days=i)).weekday()]})' for i in range(7)]
+    #weekday_jp = ["月", "火", "水", "木", "金", "土", "日"]
+    #date_index = [f'{(start_dt + timedelta(days=i)).strftime("%m/%d")} ({weekday_jp[(start_dt + timedelta(days=i)).weekday()]})' for i in range(7)]
+    date_index = [(start_dt + timedelta(days=i)).strftime("%m/%d (%a)") for i in range(7)]
     output = pd.DataFrame(0, index=date_index, columns=columns)
 
     # 7日間を10分間隔で区切るスロットを生成
@@ -53,8 +54,8 @@ def db2df(member_name, start_dt):
 # pandasのDataframe型を画像に変換する
 def df2figure(df, output_path, member_name, start_dt):
     # 日本語フォントの設定
-    font_path = "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"
-    font_prop = fm.FontProperties(fname=font_path)
+    #font_path = "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"
+    #font_prop = fm.FontProperties(fname=font_path)
 
     # 合計分数のカウント
     count = df.sum(axis=1)
@@ -86,8 +87,9 @@ def df2figure(df, output_path, member_name, start_dt):
     ax_top.set_xticklabels(time_labels, rotation=0, fontsize=15)
     #ax.tick_params(axis="y", labelrotation=0, labelsize=15)
     #plt.xticks(ticks=[i * 6 for i in range(25)], labels=time_labels, rotation=0, fontsize=15)
-    plt.yticks(rotation=0, fontsize=15, fontproperties=font_prop)
-
+    #plt.yticks(rotation=0, fontsize=15, fontproperties=font_prop)
+    plt.yticks(rotation=0, fontsize=15)
+               
     # 60分毎に縦の罫線
     for i in range(0, len(df.columns)+1, 6):
         if time_labels[i//6] == "12" or time_labels[i//6] == "00":
