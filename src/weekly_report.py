@@ -31,7 +31,7 @@ def db2df(member_name, start_dt):
     output = pd.DataFrame(0, index=date_index, columns=columns)
 
     # 7日間を10分間隔で区切るスロットを生成
-    time_slots = [start_dt + timedelta(minutes=10 * i) for i in range(6*24*7)]
+    time_slots = [start_dt + timedelta(minutes=10 * i) for i in range(6*24*7+1)]
 
     # 入室していたスロットを1にする
     enter_flag = False
@@ -45,10 +45,17 @@ def db2df(member_name, start_dt):
             enter_flag = True
         elif el == "leave" and enter_flag:
             to_dt = record.iat[i, 1]
-            while current_slot_id < len(time_slots) and time_slots[current_slot_id] < to_dt:
+            while time_slots[current_slot_id] < to_dt:
                 output.iat[current_slot_id//(6*24), current_slot_id%(6*24)] = 1
                 current_slot_id += 1
+                if current_slot_id >= len(time_slots) - 1:
+                    return output
             enter_flag = False
+
+    # 終了時刻前に入室し、終了時刻後に退室した場合、終了時刻のスロットまで埋める
+    if el == "enter":
+        for i in range(current_slot_id, len(time_slots) - 1):
+            output.iat[i//(6*24), i%(6*24)] = 1
     return output
 
 # pandasのDataframe型を画像に変換する
@@ -128,6 +135,11 @@ def send_all_figure(start_dt):
         dm.send_slack_dm_with_image(user_id=row['slackid'], image_path=row['image_path'])
 
 if __name__ == "__main__":
-    start_dt = datetime.strptime("2025/03/23 06:00:00", "%Y/%m/%d %H:%M:%S")
-    make_figure(start_dt)
+    start_str = input("Input start time (format=%Y/%m/%d %H:%M:%S):")
+    try:
+        start_dt = datetime.strptime(start_str, "%Y/%m/%d %H:%M:%S")
+    except Exception:
+        print("Input Error: Check your input format and try again.")
+        exit()
+    send_all_figure(start_dt)
     #print(db2df("Yamane", start_dt))
