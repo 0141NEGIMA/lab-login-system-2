@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 import seaborn as sns
 from datetime import timedelta, datetime
 from util import sqlite as sq
@@ -17,8 +18,15 @@ def db2df(member_name, start_dt):
     record = record.drop(record[~record['timestamp'].between(start_dt, start_dt + pd.Timedelta(weeks=1))].index)
 
     # 0に初期化されたoutput
+    columns = []
+    for add_h in range(24):
+        for add_m in range(0, 60, 10):
+            slot_dt = start_dt + timedelta(hours=add_h, minutes=add_m)
+            columns.append(f"{slot_dt.strftime('%H')}:{slot_dt.strftime('%M')}")
+
     columns = [f"{hh:02}:{mm:02}" for hh in range(24) for mm in range(0, 60, 10)]
-    date_index = [(start_dt + timedelta(days=i)).strftime("%-m/%-d (%a)") for i in range(7)]
+    weekday_jp = ["月", "火", "水", "木", "金", "土", "日"]
+    date_index = [f'{(start_dt + timedelta(days=i)).strftime("%m/%d")} ({weekday_jp[(start_dt + timedelta(days=i)).weekday()]})' for i in range(7)]
     output = pd.DataFrame(0, index=date_index, columns=columns)
 
     # 7日間を10分間隔で区切るスロットを生成
@@ -44,9 +52,14 @@ def db2df(member_name, start_dt):
 
 # pandasのDataframe型を画像に変換する
 def df2figure(df, output_path, member_name, start_dt):
+    # 日本語フォントの設定
+    font_path = "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"
+    font_prop = fm.FontProperties(fname=font_path)
+
     # 合計分数のカウント
     count = df.sum(axis=1)
     df = df.rename(index={old: f"{old}:  {count[old]//6}h{count[old]%6*10}m" for old in df.index.to_list()})
+    weekly_count = f"Total: {count.sum()//6}h{count.sum()%6*10}m"
 
     # 曜日間に空白を挿入
     gap = pd.DataFrame(0, index=[""], columns=df.columns, dtype=int)
@@ -56,29 +69,44 @@ def df2figure(df, output_path, member_name, start_dt):
         row_df = df.iloc[[i]]
         expanded_df = pd.concat([expanded_df, gap, row_df])
     expanded_df = expanded_df.astype(int)
-    expanded_df = expanded_df.assign(Added=0) # 24:00に罫線を引くため
+    expanded_df = expanded_df.assign(Added=0) # 右端に罫線を引くため
 
     # プロットの作成
-    fig = plt.figure(figsize=(20, 10))
+    fig, ax = plt.subplots(figsize=(20, 10))
     sns.heatmap(expanded_df, cmap=["white", "skyblue"], cbar=False, linewidths=0.5, linecolor="white")
 
     # 軸ラベルは60分毎
-    time_labels = [f"{hh:02}" for hh in range(25)]
-    plt.xticks(ticks=[i * 6 for i in range(25)], labels=time_labels, rotation=0, fontsize=15)
-    plt.yticks(rotation=0, fontsize=15)
+    time_labels = [f"{(start_dt + timedelta(hours=add_h)).strftime('%H')}" for add_h in range(25)]
+    ticks = [i * 6 for i in range(25)]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(time_labels, rotation=0, fontsize=15)
+
+    ax_top = ax.secondary_xaxis('top')
+    ax_top.set_xticks(ticks)
+    ax_top.set_xticklabels(time_labels, rotation=0, fontsize=15)
+    #ax.tick_params(axis="y", labelrotation=0, labelsize=15)
+    #plt.xticks(ticks=[i * 6 for i in range(25)], labels=time_labels, rotation=0, fontsize=15)
+    plt.yticks(rotation=0, fontsize=15, fontproperties=font_prop)
 
     # 60分毎に縦の罫線
     for i in range(0, len(df.columns)+1, 6):
-        plt.axvline(i, color='gray', linestyle='--', linewidth=0.5)
+        if time_labels[i//6] == "12" or time_labels[i//6] == "00":
+            plt.axvline(i, color='red', linestyle='--', linewidth=1.0)
+        else:
+            plt.axvline(i, color='gray', linestyle='--', linewidth=0.5)
     plt.axvline(200, color='gray', linestyle='--', linewidth=0.5)
 
     # タイトルを追加
     end_dt = start_dt + timedelta(days=6)
-    plt.title(f"{member_name} ({start_dt.strftime('%Y/%m/%d')} - {end_dt.strftime('%m/%d')})", fontsize=20)
+    plt.title(f"{member_name} ({start_dt.strftime('%Y/%m/%d')} - {end_dt.strftime('%m/%d')})", fontsize=20, pad=20)
+
+    # 週の合計時間を表示
+    plt.text(-15, 14.5, weekly_count, fontsize=15)
 
     # 表示
     fig.align_labels
     plt.savefig(output_path)
+    return output_path
 
 def make_figure(start_dt):
     members = sq.get_all_members_info()
@@ -97,6 +125,7 @@ def send_all_figure(start_dt):
     for row in results:
         dm.send_slack_dm_with_image(user_id=row['slackid'], image_path=row['image_path'])
 
-
-start_dt = datetime.strptime("2025/03/23 00:00:00", "%Y/%m/%d %H:%M:%S")
-make_figure(start_dt)
+if __name__ == "__main__":
+    start_dt = datetime.strptime("2025/03/23 06:00:00", "%Y/%m/%d %H:%M:%S")
+    make_figure(start_dt)
+    #print(db2df("Yamane", start_dt))
