@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import seaborn as sns
 from datetime import timedelta, datetime
+import time
 from util import sqlite as sq
 from util import slack_DM as dm
 
@@ -134,7 +135,17 @@ def send_all_figure(start_dt):
     for row in results:
         dm.send_slack_dm_with_image(user_id=row['slackid'], image_path=row['image_path'])
 
+
 if __name__ == "__main__":
+    print("Started auto weekly report system.")
+    while True:
+        now = datetime.now()
+        if now.weekday() == 0 and now.hour == 9 and now.minute == 0 and now.second == 0:
+            start_dt = now + timedelta(days=-7, hours=-3)
+            send_all_figure(start_dt)
+            time.sleep(60)
+        time.sleep(0.5)
+"""
     start_str = input("Input start time (format=%Y/%m/%d %H:%M:%S):")
     try:
         start_dt = datetime.strptime(start_str, "%Y/%m/%d %H:%M:%S")
@@ -142,4 +153,4 @@ if __name__ == "__main__":
         print("Input Error: Check your input format and try again.")
         exit()
     send_all_figure(start_dt)
-    #print(db2df("Yamane", start_dt))
+"""
