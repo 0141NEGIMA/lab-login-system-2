@@ -118,6 +118,7 @@ def df2figure(df, output_path, member_name, start_dt):
     plt.savefig(output_path)
     return output_path
 
+# 全員の入退室記録を画像で作成し，画像のパスのリストを返す
 def make_figure(start_dt):
     members = sq.get_all_members_info()
     results = []
@@ -129,20 +130,23 @@ def make_figure(start_dt):
         results.append({'slackid': member['slackid'], 'image_path': output_path})
     return results
     
-
+# 全員の入退室記録を画像で作成し，全員にSlackで送付
 def send_all_figure(start_dt):
     results = make_figure(start_dt)
     for row in results:
         dm.send_slack_dm_with_image(user_id=row['slackid'], image_path=row['image_path'])
-
 
 if __name__ == "__main__":
     print("Started auto weekly report system.")
     while True:
         now = datetime.now()
         if now.weekday() == 0 and now.hour == 9 and now.minute == 0 and now.second == 0:
+            print("It's time to send weekly_report!")
             start_dt = now + timedelta(days=-7, hours=-3)
             send_all_figure(start_dt)
+            cutoff = now + timedelta(days=-14, hours=-3)
+            print("cutoff: ", cutoff.strftime("%Y/%m/%d %H:%M:%S"))
+            sq.cut_record(cutoff)
             time.sleep(60)
         time.sleep(0.5)
 """

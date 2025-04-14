@@ -28,8 +28,8 @@ def get_all_members_info():
 def register_member(member_name, mac_addr, notion_id):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    insert_query = f"INSERT INTO member (name, macaddr, notionid) VALUES ('{member_name}', '{mac_addr}', '{notion_id}');"
-    cur.execute(insert_query)
+    insert_query = f"INSERT INTO member (name, macaddr, notionid) VALUES (?, ?, ?);"
+    cur.execute(insert_query, [member_name, mac_addr, notion_id])
     conn.commit()
     conn.close()
 
@@ -37,15 +37,15 @@ def register_member(member_name, mac_addr, notion_id):
 def delete_member(member_name):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    delete_query = f"DELETE FROM member WHERE name = '{member_name}'"
-    cur.execute(delete_query)
+    delete_query = f"DELETE FROM member WHERE name = ?"
+    cur.execute(delete_query, [member_name])
     conn.commit()
     conn.close()
 
 # 特定のメンバーの入退室記録を取得する
 def select_from_record(member_name):
     conn = sqlite3.connect(DB_NAME)
-    df = pd.read_sql_query(f"SELECT enter_leave,timestamp FROM record WHERE name='{member_name}'", conn)
+    df = pd.read_sql_query(f"SELECT enter_leave,timestamp FROM record WHERE name=?", conn, params=[member_name])
     conn.close()
     return df
 
@@ -53,8 +53,8 @@ def select_from_record(member_name):
 def insert_into_record(member_name, enter_leave, timestamp):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    insert_query = f"INSERT INTO record (name, enter_leave, timestamp) VALUES ('{member_name}', '{enter_leave}', '{timestamp}');"
-    cur.execute(insert_query)
+    insert_query = f"INSERT INTO record (name, enter_leave, timestamp) VALUES (?, ?, ?);"
+    cur.execute(insert_query, [member_name, enter_leave, timestamp])
     conn.commit()
     conn.close()
 
@@ -62,10 +62,10 @@ def insert_into_record(member_name, enter_leave, timestamp):
 def reset_table(table_name):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    delete_query = f"DELETE FROM {table_name};"
-    sequence_reset_query = f"DELETE FROM sqlite_sequence WHERE name = '{table_name}';"
-    cur.execute(delete_query)
-    cur.execute(sequence_reset_query)
+    delete_query = f"DELETE FROM ?;"
+    sequence_reset_query = f"DELETE FROM sqlite_sequence WHERE name = ?;"
+    cur.execute(delete_query, [table_name])
+    cur.execute(sequence_reset_query, [table_name])
     conn.commit()
     conn.close()
 
@@ -73,8 +73,8 @@ def reset_table(table_name):
 def update_mac(member_name, new_mac_addr):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    update_query = f"UPDATE member SET macaddr = '{new_mac_addr}' WHERE name = '{member_name}';"
-    cur.execute(update_query)
+    update_query = f"UPDATE member SET macaddr = ? WHERE name = ?;"
+    cur.execute(update_query, [new_mac_addr, member_name])
     conn.commit()
     conn.close()
 
@@ -82,11 +82,23 @@ def update_mac(member_name, new_mac_addr):
 def exists_member(member_name):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    update_query = f"SELECT * FROM member WHERE name = '{member_name}';"
-    cur.execute(update_query)
+    update_query = f"SELECT * FROM member WHERE name = ?;"
+    cur.execute(update_query, [member_name])
     if cur.fetchone() == None:
         conn.close()
         return False
     else:
         conn.close()
         return True
+    
+# ある時点より前のレコードをすべて削除する
+def cut_record(cutoff):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+    delete_query = f"""
+        DELETE FROM record
+        WHERE datetime(replace(timestamp, '/', '-')) < datetime(replace(?, '/', '-'))
+    """
+    cur.execute(delete_query, [cutoff])
+    conn.commit()
+    conn.close()
