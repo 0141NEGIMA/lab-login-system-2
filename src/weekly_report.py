@@ -6,6 +6,8 @@ from datetime import timedelta, datetime
 import time
 from util import sqlite as sq
 from util import slack_DM as dm
+import os
+import re
 
 # DBから入退室記録を取得してpandasのDataframe型にする
 def db2df(member_name, start_dt):
@@ -136,6 +138,25 @@ def send_all_figure(start_dt):
     for row in results:
         dm.send_slack_dm_with_image(user_id=row['slackid'], image_path=row['image_path'])
 
+# cutoffより前の画像をすべて削除
+def remove_figure(cutoff):
+    log_dir = "log"
+    file_list = os.listdir(log_dir)
+    pattern = re.compile(r'^(\d{8})_.*\.png$')
+
+    for file_name in file_list:
+        match = pattern.match(file_name)
+        if match:
+            date_str = match.group(1)
+            try:
+                dt = datetime.strptime(date_str, "%Y%m%d")
+                if dt < cutoff:
+                    file_path = os.path.join(log_dir, file_name)
+                    os.remove(file_path)
+                    print(f"Successfully removed {file_name}.")
+            except:
+                print(f"Failed to convert {file_name} to datetime.")
+
 if __name__ == "__main__":
     print("Started auto weekly report system.")
     while True:
@@ -146,7 +167,8 @@ if __name__ == "__main__":
             send_all_figure(start_dt)
             cutoff = now + timedelta(days=-14, hours=-3)
             print("cutoff: ", cutoff.strftime("%Y/%m/%d %H:%M:%S"))
-            sq.cut_record(cutoff)
+            sq.cut_record(cutoff.strftime("%Y/%m/%d %H:%M:%S"))
+            remove_figure(cutoff)
             time.sleep(60)
         time.sleep(0.5)
 """
