@@ -68,3 +68,25 @@ def reset_table(table_name):
     cur.execute(sequence_reset_query)
     conn.commit()
     conn.close()
+
+# MACアドレスを更新する
+def update_mac(member_name, new_mac_addr):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+    update_query = f"UPDATE member SET macaddr = '{new_mac_addr}' WHERE name = '{member_name}';"
+    cur.execute(update_query)
+    conn.commit()
+    conn.close()
+
+# あるメンバーがDBに存在するかどうか確認する
+def exists_member(member_name):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+    update_query = f"SELECT * FROM member WHERE name = '{member_name}';"
+    cur.execute(update_query)
+    if cur.fetchone() == None:
+        conn.close()
+        return False
+    else:
+        conn.close()
+        return True
