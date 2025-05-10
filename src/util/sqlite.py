@@ -25,11 +25,11 @@ def get_all_members_info():
     return result
 
 # 新規メンバーをDBに登録する
-def register_member(member_name, mac_addr, notion_id):
+def register_member(member_name, mac_addr, notion_id, slack_id):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    insert_query = f"INSERT INTO member (name, macaddr, notionid) VALUES (?, ?, ?);"
-    cur.execute(insert_query, [member_name, mac_addr, notion_id])
+    insert_query = f"INSERT INTO member (name, macaddr, notionid, slackid) VALUES (?, ?, ?, ?);"
+    cur.execute(insert_query, [member_name, mac_addr, notion_id, slack_id])
     conn.commit()
     conn.close()
 

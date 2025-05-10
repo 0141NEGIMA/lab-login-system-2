@@ -19,7 +19,7 @@ def db2df(member_name, start_dt):
 
     # start_dtから始まる1週間以外の行は削除
     record = record.drop(record[~record['timestamp'].between(start_dt, start_dt + pd.Timedelta(weeks=1))].index)
-
+    
     # 0に初期化されたoutput
     columns = []
     for add_h in range(24):
@@ -28,8 +28,6 @@ def db2df(member_name, start_dt):
             columns.append(f"{slot_dt.strftime('%H')}:{slot_dt.strftime('%M')}")
 
     columns = [f"{hh:02}:{mm:02}" for hh in range(24) for mm in range(0, 60, 10)]
-    #weekday_jp = ["月", "火", "水", "木", "金", "土", "日"]
-    #date_index = [f'{(start_dt + timedelta(days=i)).strftime("%m/%d")} ({weekday_jp[(start_dt + timedelta(days=i)).weekday()]})' for i in range(7)]
     date_index = [(start_dt + timedelta(days=i)).strftime("%m/%d (%a)") for i in range(7)]
     output = pd.DataFrame(0, index=date_index, columns=columns)
 
@@ -39,6 +37,7 @@ def db2df(member_name, start_dt):
     # 入室していたスロットを1にする
     enter_flag = False
     current_slot_id = 0
+    el = None
     for i in range(len(record.index)):
         el = record.iat[i, 0]
         if el == "enter":
@@ -63,10 +62,6 @@ def db2df(member_name, start_dt):
 
 # pandasのDataframe型を画像に変換する
 def df2figure(df, output_path, member_name, start_dt):
-    # 日本語フォントの設定
-    #font_path = "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"
-    #font_prop = fm.FontProperties(fname=font_path)
-
     # 合計分数のカウント
     count = df.sum(axis=1)
     df = df.rename(index={old: f"{old}:  {count[old]//6}h{count[old]%6*10}m" for old in df.index.to_list()})
@@ -171,12 +166,3 @@ if __name__ == "__main__":
             remove_figure(cutoff)
             time.sleep(60)
         time.sleep(0.5)
-"""
-    start_str = input("Input start time (format=%Y/%m/%d %H:%M:%S):")
-    try:
-        start_dt = datetime.strptime(start_str, "%Y/%m/%d %H:%M:%S")
-    except Exception:
-        print("Input Error: Check your input format and try again.")
-        exit()
-    send_all_figure(start_dt)
-"""

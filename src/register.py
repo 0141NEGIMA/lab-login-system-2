@@ -11,13 +11,14 @@ while True:
         break
     else:
         print("Bad MAC address. (example: 12:34:56:78:9a:bc)")
+slack_id = input("Enter your slack id: ")
 
 print(f"Registering {member_name}...")
 
 # notionに登録
-new_id = nt.create_member(member_name)
+notion_id = nt.create_member(member_name)
 
 # SQLiteに登録
-sql.register_member(member_name, mac_address, new_id)
+sql.register_member(member_name, mac_address, notion_id, slack_id)
 
 print(f"{member_name} was successfully registered in the DB!")
