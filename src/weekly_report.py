@@ -6,6 +6,7 @@ from datetime import timedelta, datetime
 import time
 from util import sqlite as sq
 from util import slack_DM as dm
+from util import log
 import os
 import re
 
@@ -156,13 +157,17 @@ if __name__ == "__main__":
     print("Started auto weekly report system.")
     while True:
         now = datetime.now()
-        if now.weekday() == 0 and now.hour == 9 and now.minute == 0 and now.second == 0:
-            print("It's time to send weekly_report!")
-            start_dt = now + timedelta(days=-7, hours=-3)
-            send_all_figure(start_dt)
-            cutoff = now + timedelta(days=-14, hours=-3)
-            print("cutoff: ", cutoff.strftime("%Y/%m/%d %H:%M:%S"))
-            sq.cut_record(cutoff.strftime("%Y/%m/%d %H:%M:%S"))
-            remove_figure(cutoff)
-            time.sleep(60)
-        time.sleep(0.5)
+        try:
+            if now.weekday() == 0 and now.hour == 9 and now.minute == 0:
+                print("It's time to send weekly_report!")
+                start_dt = now + timedelta(days=-7, hours=-3)
+                send_all_figure(start_dt)
+                cutoff = now + timedelta(days=-14, hours=-3)
+                print("cutoff: ", cutoff.strftime("%Y/%m/%d %H:%M:%S"))
+                sq.cut_record(cutoff.strftime("%Y/%m/%d %H:%M:%S"))
+                remove_figure(cutoff)
+                time.sleep(60)
+        except Exception as e:
+            log.write_error_log(e)
+
+        time.sleep(10)
