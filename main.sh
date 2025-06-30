@@ -24,5 +24,8 @@ PIDS+=($!)
 ./lls2env/bin/python3 src/weekly_report.py &
 PIDS+=($!)
 
+./lls2env/bin/python3 src/monthly_reset.py &
+PIDS+=($!)
+
 wait "${PIDS[@]}"
 cleanup $status

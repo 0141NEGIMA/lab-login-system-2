@@ -73,6 +73,8 @@ if __name__ == "__main__":
 
                 send_all_figure(path)
 
+                nt.reset_total_minutes()
+
                 time.sleep(60)
         except Exception as e:
             log.write_error_log(e)

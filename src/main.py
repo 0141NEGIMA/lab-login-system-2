@@ -53,5 +53,5 @@ while True:
     now = datetime.now()
     if now.minute % n == 0 and now.second == 0:
         update()
-        time.sleep(10)
+        #time.sleep(10)
     time.sleep(0.5)

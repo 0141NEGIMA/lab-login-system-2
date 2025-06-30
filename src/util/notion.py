@@ -99,3 +99,8 @@ def get_total_minutes():
         database_id=DATABASE_ID
     )
     return {member["properties"]["名前"]["title"][0]["plain_text"]: member["properties"]["累計（分）"]["number"] for member in response["results"]}
+
+def reset_total_minutes():
+    ids = [member['notionid'] for member in get_all_members_info()]
+    for id in ids:
+        set_total_minutes(id, 0)
