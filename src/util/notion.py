@@ -93,3 +93,9 @@ def delete_member(member_name):
     else:
         print(f"Notion: {member_name} was not found.")
         return 1
+
+def get_total_minutes():
+    response = client.databases.query(
+        database_id=DATABASE_ID
+    )
+    return {member["properties"]["名前"]["title"][0]["plain_text"]: member["properties"]["累計（分）"]["number"] for member in response["results"]}
