@@ -6,3 +6,4 @@ src/util_test.py
 src/util/.env
 .DS_Store
 src/tmp.py
+tmp.png
