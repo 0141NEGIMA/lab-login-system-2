@@ -54,25 +54,30 @@ def send_all_figure(path):
     for id in ids:
         dm.send_slack_dm_with_image(user_id=id, image_path=path)
 
+def make_send_figure(year, month):
+    # Notionから現在の状態を取得
+    total_minutes = nt.get_total_minutes()
+    sorted_total_minutes = sorted(total_minutes.items(), key=lambda x: x[1], reverse=True)
+    names = [item[0] for item in sorted_total_minutes]
+    hours = [item[1]/60 for item in sorted_total_minutes]
+
+    # 月次ランキング画像を作成してパスを取得
+    path = make_figure(names, hours, year, month)
+
+    # 全員に送信
+    send_all_figure(path)
+
 if __name__ == "__main__":
     print("Started auto weekly report system.")
     while True:
         now = datetime.now()
         try:
             if now.day == 1 and now.hour == 10 and now.minute == 0:
-                print("It's time to reset!")
-
-                # Notionから現在の状態を取得
-                total_minutes = nt.get_total_minutes()
-                sorted_total_minutes = sorted(total_minutes.items(), key=lambda x: x[1], reverse=True)
-                names = [item[0] for item in sorted_total_minutes]
-                hours = [item[1]/60 for item in sorted_total_minutes]
+                print("It's time to monthly reset!")
 
                 yesterday = now + timedelta(days=-1)
-                path = make_figure(names, hours, yesterday.year, yesterday.month)
-
-                send_all_figure(path)
-
+                make_send_figure(yesterday.year, yesterday.month)
+                
                 nt.reset_total_minutes()
 
                 time.sleep(60)
