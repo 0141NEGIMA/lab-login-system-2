@@ -7,7 +7,7 @@ DB_NAME = 'db/lab_login_system_2.db'
 def init():
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    create_member_query = "CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING, macaddr STRING, notionid STRING)"
+    create_member_query = "CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING, macaddr STRING, notionid STRING, slackid STRING)"
     create_record_query = "CREATE TABLE IF NOT EXISTS record (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING, enter_leave STRING, timestamp STRING, foreign key (name) references member(name))"
     cur.execute(create_member_query)
     cur.execute(create_record_query)

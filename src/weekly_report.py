@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 import seaborn as sns
 from datetime import timedelta, datetime
 import time

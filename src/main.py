@@ -8,7 +8,7 @@ import util.slack_status as slc
 from util.config import get_slack_user_name
 
 # 入退室チェック間隔（分）
-n = 1
+n = 2
 
 # テーブル作成
 sq.init()
@@ -53,5 +53,5 @@ while True:
     now = datetime.now()
     if now.minute % n == 0 and now.second == 0:
         update()
-        time.sleep(10)
+        #time.sleep(10)
     time.sleep(0.5)
