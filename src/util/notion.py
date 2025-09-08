@@ -10,7 +10,7 @@ def get_all_members_info():
     response = client.databases.query(
         database_id=DATABASE_ID
     )
-    return [{"notionid": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"]} for member in response["results"]]
+    return [{"notionid": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"], "entry_time": member["properties"]["入室時刻"]["date"]} for member in response["results"]]
 
 def enter_room(page_id):
     response = client.pages.update(
@@ -19,11 +19,6 @@ def enter_room(page_id):
             "入退室状況": {
                 "status": {
                     "name": "入室"
-                }
-            },
-            "入室時刻": {
-                "date": {
-                    "start": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
                 }
             }
         }
@@ -110,3 +105,27 @@ def reset_total_minutes():
     ids = [member['notionid'] for member in get_all_members_info()]
     for id in ids:
         set_total_minutes(id, 0)
+
+def set_entry_time(page_id):
+    response = client.pages.update(
+        page_id=page_id,
+        properties={
+            "入室時刻": {
+                "date": {
+                    "start": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
+                }
+            }
+        }
+    )
+
+def reset_entry_time():
+    ids = [member['notionid'] for member in get_all_members_info()]
+    for id in ids:
+        response = client.pages.update(
+            page_id=id,
+            properties={
+                "入室時刻": {
+                    "date": None
+                }
+            }
+        )

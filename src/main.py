@@ -24,6 +24,7 @@ def update():
         for member in all_members:
             target_addr = member["macaddr"]
             target_notionid = member["notionid"]
+            target_entry_time = member["entry_time"]
             
             target_notion_info = [t for t in all_notion_status if t["notionid"] == target_notionid][0]
             target_notion_status = target_notion_info["status"]
@@ -37,6 +38,8 @@ def update():
                     nt.set_total_minutes(target_notionid, target_total_minutes + n)
                 elif target_notion_status == "退室": # 新たに入室した人は更新
                     nt.enter_room(target_notionid)
+                    if target_entry_time == None: # 今日初めての入室なら
+                        nt.set_entry_time(target_notionid)
                     if member['name'] == get_slack_user_name():
                         slc.update_slack_status(clear=False)
                     sq.insert_into_record(member['name'], 'enter', datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
@@ -53,5 +56,6 @@ while True:
     now = datetime.now()
     if now.minute % n == 0 and now.second == 0:
         update()
-        #time.sleep(10)
+    if now.hour == 6 and now.minute == 0 and now.second == 0:
+        nt.reset_entry_time()
     time.sleep(0.5)
