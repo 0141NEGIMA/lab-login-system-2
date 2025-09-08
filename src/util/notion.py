@@ -1,5 +1,6 @@
 from notion_client import Client
 from util.config import get_notion_token, get_database_id
+from datetime import datetime
 
 NOTION_TOKEN = get_notion_token()
 DATABASE_ID = get_database_id()
@@ -18,6 +19,11 @@ def enter_room(page_id):
             "入退室状況": {
                 "status": {
                     "name": "入室"
+                }
+            },
+            "入室時刻": {
+                "date": {
+                    "start": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
                 }
             }
         }
