@@ -119,13 +119,14 @@ def set_entry_time(page_id):
     )
 
 def reset_entry_time():
-    ids = [member['notionid'] for member in get_all_members_info()]
-    for id in ids:
-        response = client.pages.update(
-            page_id=id,
-            properties={
-                "入室時刻": {
-                    "date": None
+    members = get_all_members_info()
+    for member in members:
+        if member['entry_time'] != None:
+            response = client.pages.update(
+                page_id=member['notionid'],
+                properties={
+                    "入室時刻": {
+                        "date": None
+                    }
                 }
-            }
-        )
+            )

@@ -40,6 +40,7 @@ def update():
                 elif target_notion_status == "退室": # 新たに入室した人は更新
                     nt.enter_room(target_notionid)
                     if target_entry_time == None: # 今日初めての入室なら
+                        print("MAIN: set_entry_time()")
                         nt.set_entry_time(target_notionid)
                     if member['name'] == get_slack_user_name():
                         slc.update_slack_status(clear=False)
