@@ -22,6 +22,7 @@ def update():
         # bluetooth 疎通確認
         all_members = sq.get_all_members_info()
         for member in all_members:
+            print(f"{member}:\n")
             target_addr = member["macaddr"]
             target_notionid = member["notionid"]
             target_entry_time = member["entry_time"]
@@ -31,6 +32,7 @@ def update():
             target_total_minutes = target_notion_info["total"]
             
             target_ping_status = bt.check_bluetooth_device(target_addr)
+            print(target_ping_status, "\n")
             
             # Notionの更新
             if target_ping_status == 1: # 疎通成功したら
