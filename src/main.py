@@ -38,9 +38,8 @@ def update():
                     nt.set_total_minutes(target_notionid, target_total_minutes + n)
                 elif target_notion_status == "退室": # 新たに入室した人は更新
                     nt.enter_room(target_notionid)
-                    if target_entry_time == None: # 今日初めての入室なら
-                        print("MAIN: set_entry_time()")
-                        nt.set_entry_time(target_notionid)
+                    if target_entry_time == None or datetime.strptime(target_entry_time, "%Y-%m-%dT%H:%M:%S.000+09:00") < datetime.now().replace(hour=6, minute=0, second=0, microsecond=0): # 今日初めての入室なら
+                        nt.set_entry_time(target_notionid, datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00"))
                     if member['name'] == get_slack_user_name():
                         slc.update_slack_status(clear=False)
                     sq.insert_into_record(member['name'], 'enter', datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
@@ -53,10 +52,9 @@ def update():
     except Exception as e:
         log.write_error_log(e)
 
-while True:
-    now = datetime.now()
-    if now.minute % n == 0 and now.second == 0:
-        update()
-    if now.hour == 6 and now.minute == 0 and now.second == 0:
-        nt.reset_entry_time()
-    time.sleep(0.5)
+if __name__ == "__main__":
+    while True:
+        now = datetime.now()
+        if now.minute % n == 0 and now.second == 0:
+            update()
+        time.sleep(0.5)

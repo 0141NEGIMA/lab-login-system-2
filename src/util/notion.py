@@ -1,6 +1,5 @@
 from notion_client import Client
 from util.config import get_notion_token, get_database_id
-from datetime import datetime
 
 NOTION_TOKEN = get_notion_token()
 DATABASE_ID = get_database_id()
@@ -106,27 +105,14 @@ def reset_total_minutes():
     for id in ids:
         set_total_minutes(id, 0)
 
-def set_entry_time(page_id):
+def set_entry_time(page_id, datetime_str):
     response = client.pages.update(
         page_id=page_id,
         properties={
             "入室時刻": {
                 "date": {
-                    "start": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
+                    "start": datetime_str
                 }
             }
         }
     )
-
-def reset_entry_time():
-    members = get_all_members_info()
-    for member in members:
-        if member['entry_time'] != None:
-            response = client.pages.update(
-                page_id=member['notionid'],
-                properties={
-                    "入室時刻": {
-                        "date": None
-                    }
-                }
-            )
