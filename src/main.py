@@ -28,7 +28,7 @@ def update():
             target_notion_info = [t for t in all_notion_status if t["notionid"] == target_notionid][0]
             target_notion_status = target_notion_info["status"]
             target_total_minutes = target_notion_info["total"]
-            target_entry_time = target_notion_info["entry_time"]
+            target_entry_time = target_notion_info["entry_time"]["start"]
             
             target_ping_status = bt.check_bluetooth_device(target_addr)
             
