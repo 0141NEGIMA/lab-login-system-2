@@ -21,6 +21,10 @@ def update():
         
         # bluetooth 疎通確認
         all_members = sq.get_all_members_info()
+        
+        for member in all_members:
+            print(f"{member}\n")
+
         for member in all_members:
             target_addr = member["macaddr"]
             target_notionid = member["notionid"]
