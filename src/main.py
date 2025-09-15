@@ -35,6 +35,7 @@ def update():
             target_entry_time = target_notion_info["entry_time"]["start"]
             
             target_ping_status = bt.check_bluetooth_device(target_addr)
+            print(f"{target_addr}: {target_ping_status}")
             
             # Notionの更新
             if target_ping_status == 1: # 疎通成功したら
