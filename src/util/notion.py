@@ -1,8 +1,9 @@
 from notion_client import Client
-from util.config import get_notion_token, get_database_id
+from util.config import get_notion_token, get_database_id, get_alive_page_id
 
 NOTION_TOKEN = get_notion_token()
 DATABASE_ID = get_database_id()
+ALIVE_PAGE_ID = get_alive_page_id()
 client = Client(auth=NOTION_TOKEN)
 
 def get_all_members_info():
@@ -116,3 +117,6 @@ def set_entry_time(page_id, datetime_str):
             }
         }
     )
+
+def update_alive():
+    set_total_minutes(ALIVE_PAGE_ID, 0)

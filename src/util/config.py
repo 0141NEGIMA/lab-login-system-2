@@ -5,6 +5,7 @@ load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 DATABASE_ID = os.getenv("DATABASE_ID")
+ALIVE_PAGE_ID = os.getenv("ALIVE_PAGE_ID")
 
 SLACK_USER_NAME = os.getenv("SLACK_USER_NAME")
 SLACK_TOKEN = os.getenv("SLACK_TOKEN")
@@ -32,3 +33,6 @@ def get_status_emoji():
 
 def get_slack_bot_token():
     return SLACK_BOT_TOKEN
+
+def get_alive_page_id():
+    return ALIVE_PAGE_ID

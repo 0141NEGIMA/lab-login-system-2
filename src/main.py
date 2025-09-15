@@ -49,6 +49,7 @@ def update():
                     if member['name'] == get_slack_user_name():
                         slc.update_slack_status(clear=True)
                     sq.insert_into_record(member['name'], 'leave', datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+        nt.update_alive()
     except Exception as e:
         log.write_error_log(e)
 
