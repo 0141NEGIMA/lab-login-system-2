@@ -22,7 +22,7 @@ def update():
         # bluetooth 疎通確認
         all_members = sq.get_all_members_info()
         
-        for member in all_members:
+        for member in all_notion_status:
             print(f"{member}\n")
 
         for member in all_members:
