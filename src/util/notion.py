@@ -10,7 +10,7 @@ def get_all_members_info():
     response = client.databases.query(
         database_id=DATABASE_ID
     )
-    return [{"notionid": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"], "entry_time": member["properties"]["入室時刻"]["date"]} for member in response["results"] if member["id"] != ALIVE_PAGE_ID]
+    return [{"notionid": member["id"], "status": member["properties"]["入退室状況"]["status"]["name"], "total": member["properties"]["累計（分）"]["number"], "entry_time": member["properties"]["入室時刻"]["date"]} for member in response["results"] if member["id"].replace("-", "") != ALIVE_PAGE_ID]
 
 def enter_room(page_id):
     response = client.pages.update(
